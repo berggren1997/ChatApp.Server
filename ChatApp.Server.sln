@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32901.215
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatApp.Api", "ChatApp.Api\ChatApp.Api.csproj", "{DD893D49-D6D7-4280-BE1D-68127A775BF2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatApp.Entities", "ChatApp.Entities\ChatApp.Entities.csproj", "{1D232728-75D4-4FDD-88AC-135B062C2226}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatApp.DataAccess", "ChatApp.DataAccess\ChatApp.DataAccess.csproj", "{D182C984-0166-4FD4-9E95-63A58B207A65}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatApp.Contracts", "ChatApp.Contracts\ChatApp.Contracts.csproj", "{A7B62F65-49B3-48B4-AFF6-FB72D092E6E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatApp.Service", "ChatApp.Service\ChatApp.Service.csproj", "{44466C9E-DB4C-467C-9D97-97FC8E0D96A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatApp.Service.Contracts", "ChatApp.Service.Contracts\ChatApp.Service.Contracts.csproj", "{DDF439F3-0ABA-4B91-9045-2E829919BAF4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatApp.Shared", "ChatApp.Shared\ChatApp.Shared.csproj", "{CA8CEE01-A835-41EF-9D44-787D2317D7A0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DD893D49-D6D7-4280-BE1D-68127A775BF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD893D49-D6D7-4280-BE1D-68127A775BF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD893D49-D6D7-4280-BE1D-68127A775BF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD893D49-D6D7-4280-BE1D-68127A775BF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D232728-75D4-4FDD-88AC-135B062C2226}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D232728-75D4-4FDD-88AC-135B062C2226}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D232728-75D4-4FDD-88AC-135B062C2226}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D232728-75D4-4FDD-88AC-135B062C2226}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D182C984-0166-4FD4-9E95-63A58B207A65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D182C984-0166-4FD4-9E95-63A58B207A65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D182C984-0166-4FD4-9E95-63A58B207A65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D182C984-0166-4FD4-9E95-63A58B207A65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7B62F65-49B3-48B4-AFF6-FB72D092E6E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7B62F65-49B3-48B4-AFF6-FB72D092E6E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7B62F65-49B3-48B4-AFF6-FB72D092E6E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7B62F65-49B3-48B4-AFF6-FB72D092E6E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44466C9E-DB4C-467C-9D97-97FC8E0D96A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44466C9E-DB4C-467C-9D97-97FC8E0D96A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44466C9E-DB4C-467C-9D97-97FC8E0D96A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44466C9E-DB4C-467C-9D97-97FC8E0D96A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDF439F3-0ABA-4B91-9045-2E829919BAF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDF439F3-0ABA-4B91-9045-2E829919BAF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDF439F3-0ABA-4B91-9045-2E829919BAF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDF439F3-0ABA-4B91-9045-2E829919BAF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA8CEE01-A835-41EF-9D44-787D2317D7A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA8CEE01-A835-41EF-9D44-787D2317D7A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA8CEE01-A835-41EF-9D44-787D2317D7A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA8CEE01-A835-41EF-9D44-787D2317D7A0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1B1E7E65-1668-48A5-8423-D1DC917723A1}
+	EndGlobalSection
+EndGlobal

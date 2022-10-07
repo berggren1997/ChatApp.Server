@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ChatApp.Entities\ChatApp.Entities.csproj" />
+    <ProjectReference Include="..\ChatApp.Shared\ChatApp.Shared.csproj" />
+  </ItemGroup>
+
+</Project>
