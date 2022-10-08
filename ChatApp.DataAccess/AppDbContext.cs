@@ -19,6 +19,12 @@ namespace ChatApp.DataAccess
                 .HasOne(x => x.Conversation)
                 .WithMany(x => x.Messages)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Conversation>()
+                .HasOne(x => x.CreatedByAppUser)
+                .WithMany(x => x.Conversations)
+                .OnDelete(DeleteBehavior.Restrict);
+            
             //modelBuilder.Entity<Message>()
             //    .HasOne(a => a.Sender)
             //    .WithMany(x => x.ChatMessagesFromUser)
