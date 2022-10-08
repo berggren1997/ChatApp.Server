@@ -2,6 +2,7 @@
 using ChatApp.Service.Contracts.Authentication;
 using ChatApp.Shared.DataTransferObjects.User;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -14,13 +15,16 @@ namespace ChatApp.Service.Authentication
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly IUserAccessor _userAccessor;
 
-        private AppUser _currentUser;
+        private AppUser? _currentUser;
 
-        public AuthService(UserManager<AppUser> userManager, IConfiguration configuration)
+        public AuthService(UserManager<AppUser> userManager, IConfiguration configuration, 
+            IUserAccessor userAccessor)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _userAccessor = userAccessor;
         }
 
         public async Task<IdentityResult> RegisterUser(UserRegistrationDto createUserDto)
@@ -44,7 +48,31 @@ namespace ChatApp.Service.Authentication
             // TODO: Kasta custom exception
             if (_currentUser == null) throw new Exception();
 
-            return await _userManager.CheckPasswordAsync(_currentUser, userDto.Password);
+            return _currentUser != null && await _userManager.CheckPasswordAsync(_currentUser, userDto.Password);
+        }
+
+        public async Task<List<UserDto>> SearchForUserByUsername(string username)
+        {
+            var users = await _userManager.Users
+                .Where(x => x.UserName.Contains(username)).ToListAsync();
+
+            if(users == null) 
+                throw new Exception("No users with given search term was found.");
+
+            var usersDto = users.Select(x => new UserDto
+            {
+                Id = x.Id,
+                Username = x.UserName
+            }).ToList();
+
+            return usersDto;
+        }
+
+        public async Task<AppUser> GetCurrentUser()
+        {
+            var userId = _userAccessor.GetCurrentUserId();
+            var user = await _userManager.Users.Where(x => x.Id == userId).FirstOrDefaultAsync();
+            return user;
         }
 
         public async Task<string> CreateToken()
@@ -53,11 +81,14 @@ namespace ChatApp.Service.Authentication
             var claims = await GetClaims();
             var tokenOptions = GenerateTokenOptions(signingCredentials, claims);
 
-            return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
+            return accessToken;
         }
         private SigningCredentials GetSigningCredentials()
         {
-            var key = Encoding.UTF8.GetBytes(_configuration["JWTSettings:key"]);
+            var key = Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]);
+            
             var secret = new SymmetricSecurityKey(key);
 
             return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
@@ -82,14 +113,14 @@ namespace ChatApp.Service.Authentication
         private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
         {
             var tokenOptions = new JwtSecurityToken(
-                issuer: null,
-                audience: null,
+                issuer: _configuration["JwtSettings:Issuer"],
+                audience: _configuration["JwtSettings:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddDays(1),
-                signingCredentials: signingCredentials);
+                expires: DateTime.Now.AddDays(10),
+                signingCredentials: signingCredentials
+                );
 
             return tokenOptions;
         }
-
     }
 }

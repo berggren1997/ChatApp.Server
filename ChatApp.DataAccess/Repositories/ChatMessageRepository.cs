@@ -10,19 +10,12 @@ namespace ChatApp.DataAccess.Repositories
         public ChatMessageRepository(AppDbContext context) : base(context)
         { }
 
-        public void CreateMessage(Message message)
-        {
+        public async Task<IEnumerable<Message>> GetMessages(int conversationId, bool trackChanges) =>
+            await FindByCondition(x => x.ConversationId == conversationId, trackChanges)
+            .Include(x => x.Sender)
+            .OrderBy(x => x.CreatedAt)
+            .ToListAsync();
+        public void CreateMessage(Message message) =>
             Create(message);
-        }
-
-        public async Task<IEnumerable<Message>> GetConversation(int conversationId)
-        {
-            return await FindByCondition(h => (h.SenderId == conversationId || 
-            h.ReceiverId == conversationId), trackChanges: true)
-                .OrderBy(x => x.CreatedAt)
-                .Include(x => x.Sender)
-                .Include(x => x.Receiver)
-                .ToListAsync();
-        }
     }
 }

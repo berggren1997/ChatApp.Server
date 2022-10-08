@@ -1,11 +1,16 @@
-﻿using ChatApp.DataAccess;
+﻿using ChatApp.Contracts.Repositories;
+using ChatApp.DataAccess;
+using ChatApp.DataAccess.Repositories;
 using ChatApp.Entities.Models;
 using ChatApp.Service;
+using ChatApp.Service.Authentication;
 using ChatApp.Service.Contracts;
+using ChatApp.Service.Contracts.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 namespace ChatApp.Api.Extensions.Service
@@ -21,8 +26,14 @@ namespace ChatApp.Api.Extensions.Service
             });
         }
 
+        public static void ConfigureRepositoryManager(this IServiceCollection services) =>
+            services.AddScoped<IRepositoryManager, RepositoryManager>();
+
         public static void ConfigureServiceManager(this IServiceCollection services) => 
             services.AddScoped<IServiceManager, ServiceManager>();
+
+        public static void ConfigureUserAccessorService(this IServiceCollection services) =>
+            services.AddScoped<IUserAccessor, UserAccessor>();
 
 
         public static void ConfigureIdentity(this IServiceCollection services)
@@ -37,6 +48,51 @@ namespace ChatApp.Api.Extensions.Service
                 config.User.RequireUniqueEmail = true;
             }).AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
+        }
+
+        public static void ConfigureCors(this IServiceCollection services)
+        {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("DefaultPolicy", config =>
+                {
+                    config.AllowAnyHeader();
+                    config.AllowAnyOrigin();
+                    config.AllowAnyMethod();
+                    //config.WithOrigins("https://localhost:7244");
+                    //config.AllowCredentials();
+                });
+            });
+        }
+
+        public static void ConfiugreSwaggerAuthentication(this IServiceCollection services)
+        {
+            services.AddSwaggerGen(s => {
+                s.SwaggerDoc("v1", new OpenApiInfo { Title = "chat-app-API", Version = "v1" });
+                s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Place to add JWT with Bearer",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+                s.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            },
+                            Name = "Bearer"
+                        },
+                        new List<string>()
+                    }
+                });
+            });
         }
 
         public static void ConfigureJwt(this IServiceCollection services,
@@ -61,21 +117,21 @@ namespace ChatApp.Api.Extensions.Service
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
                     .GetBytes(configuration["JwtSettings:Key"]))
                 };
-                options.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = context =>
-                    {
-                        //this (access_token) has to be the EXACT name coming from client
-                        var accessToken = context.Request.Query["access_token"];
-                        var path = context.HttpContext.Request.Path;
-                        if (!string.IsNullOrEmpty(accessToken) && path.Value.Contains("chat"))
-                        {
-                            //inside our hubcontext, we will now have access to the users access token
-                            context.Token = accessToken;
-                        }
-                        return Task.CompletedTask;
-                    }
-                };
+                //options.Events = new JwtBearerEvents
+                //{
+                //    OnMessageReceived = context =>
+                //    {
+                //        //this (access_token) has to be the EXACT name coming from client
+                //        var accessToken = context.Request.Query["access_token"];
+                //        var path = context.HttpContext.Request.Path;
+                //        if (!string.IsNullOrEmpty(accessToken) && path.Value.Contains("chat"))
+                //        {
+                //            //inside our hubcontext, we will now have access to the users access token
+                //            context.Token = accessToken;
+                //        }
+                //        return Task.CompletedTask;
+                //    }
+                //};
             });
         }
     }

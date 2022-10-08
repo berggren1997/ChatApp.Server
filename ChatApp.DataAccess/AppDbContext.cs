@@ -10,20 +10,26 @@ namespace ChatApp.DataAccess
         { }
 
         public DbSet<Message> Messages { get; set; }
+        public DbSet<Conversation> Conversations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Message>()
-                .HasOne(a => a.Sender)
-                .WithMany(x => x.ChatMessagesFromUser)
-                .HasForeignKey(x => x.SenderId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Message>()
-                .HasOne(a => a.Receiver)
-                .WithMany(x => x.ChatMessagesToUser)
-                .HasForeignKey(x => x.ReceiverId)
+                .HasOne(x => x.Conversation)
+                .WithMany(x => x.Messages)
                 .OnDelete(DeleteBehavior.Restrict);
+            //modelBuilder.Entity<Message>()
+            //    .HasOne(a => a.Sender)
+            //    .WithMany(x => x.ChatMessagesFromUser)
+            //    .HasForeignKey(x => x.SenderId)
+            //    .OnDelete(DeleteBehavior.Restrict);
+
+            //modelBuilder.Entity<Message>()
+            //    .HasOne(a => a.Receiver)
+            //    .WithMany(x => x.ChatMessagesToUser)
+            //    .HasForeignKey(x => x.ReceiverId)
+            //    .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);
         }

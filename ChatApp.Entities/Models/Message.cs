@@ -9,7 +9,9 @@
         // Relationships
         public AppUser? Sender { get; set; }
         public int SenderId { get; set; }
-        public AppUser? Receiver { get; set; }
-        public int ReceiverId { get; set; }
+        public Conversation? Conversation { get; set; }
+        public int ConversationId { get; set; }
+        //public AppUser? Receiver { get; set; }
+        //public int ReceiverId { get; set; }
     }
 }

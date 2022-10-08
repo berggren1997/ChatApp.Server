@@ -9,7 +9,7 @@ namespace ChatApp.Entities.Models
         public string DisplayName { get; set; } = string.Empty;
 
         // Relationships
-        public ICollection<Message> ChatMessagesFromUser { get; set; } = new List<Message>();
-        public ICollection<Message> ChatMessagesToUser { get; set; } = new List<Message>();
+        //public ICollection<Message> ChatMessagesFromUser { get; set; } = new List<Message>();
+        //public ICollection<Message> ChatMessagesToUser { get; set; } = new List<Message>();
     }
 }

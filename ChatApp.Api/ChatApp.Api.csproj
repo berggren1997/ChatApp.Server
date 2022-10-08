@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Extensions\Middleware\**" />
+    <Content Remove="Extensions\Middleware\**" />
+    <EmbeddedResource Remove="Extensions\Middleware\**" />
+    <None Remove="Extensions\Middleware\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.9" />
     <PackageReference Include="Microsoft.EntityframeworkCore.Design" Version="6.0.9">
       <PrivateAssets>all</PrivateAssets>
@@ -17,12 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ChatApp.DataAccess\ChatApp.DataAccess.csproj" />
-    <ProjectReference Include="..\ChatApp.Service.Contracts\ChatApp.Service.Contracts.csproj" />
     <ProjectReference Include="..\ChatApp.Service\ChatApp.Service.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Extensions\Middleware\" />
   </ItemGroup>
 
 </Project>
