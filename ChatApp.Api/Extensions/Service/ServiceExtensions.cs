@@ -7,6 +7,7 @@ using ChatApp.Service.Authentication;
 using ChatApp.Service.Contracts;
 using ChatApp.Service.Contracts.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -35,6 +36,9 @@ namespace ChatApp.Api.Extensions.Service
         public static void ConfigureUserAccessorService(this IServiceCollection services) =>
             services.AddScoped<IUserAccessor, UserAccessor>();
 
+        public static void ConfigureConversationAuthorizationHandler(this IServiceCollection services) =>
+            services.AddTransient<IAuthorizationHandler, ConversationMessageRequirementsHandler>();
+
 
         public static void ConfigureIdentity(this IServiceCollection services)
         {
@@ -50,6 +54,16 @@ namespace ChatApp.Api.Extensions.Service
             .AddDefaultTokenProviders();
         }
 
+        public static void ConfigureCustomAuthPolicy(this IServiceCollection services)
+        {
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ConversationMessageRequirements", policy =>
+                {
+                    policy.Requirements.Add(new ConversationMessageRequirements());
+                });
+            });
+        }
         public static void ConfigureCors(this IServiceCollection services)
         {
             services.AddCors(options =>
@@ -122,9 +136,9 @@ namespace ChatApp.Api.Extensions.Service
                 //    OnMessageReceived = context =>
                 //    {
                 //        //this (access_token) has to be the EXACT name coming from client
-                //        var accessToken = context.Request.Query["access_token"];
+                //        var accessToken = context.Request.Query["token"];
                 //        var path = context.HttpContext.Request.Path;
-                //        if (!string.IsNullOrEmpty(accessToken) && path.Value.Contains("chat"))
+                //        if (!string.IsNullOrEmpty(accessToken) /*&& path.Value.Contains("chat")*/)
                 //        {
                 //            //inside our hubcontext, we will now have access to the users access token
                 //            context.Token = accessToken;

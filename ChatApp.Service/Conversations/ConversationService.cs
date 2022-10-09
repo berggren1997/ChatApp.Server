@@ -1,4 +1,5 @@
 ﻿using ChatApp.Contracts.Repositories;
+using ChatApp.Entities.Exceptions.NotFoundRequests;
 using ChatApp.Entities.Models;
 using ChatApp.Service.Contracts.Authentication;
 using ChatApp.Service.Contracts.Conversations;
@@ -23,37 +24,44 @@ namespace ChatApp.Service.Conversations
             _userManager = userManager;
         }
 
-        public async Task CreateConversation(CreateConversationDto conversation)
+        public async Task CreateConversation(string recipientUsername)
         {
-            var userId = _userAccessor.GetCurrentUserId();
-            
+            var creator = await _userManager.Users
+                .FirstOrDefaultAsync(x => x.Id == _userAccessor.GetCurrentUserId());
+
+            if (creator == null) throw new UserNotFoundException();
+
+            var recipient = await _userManager.Users
+                .FirstOrDefaultAsync(x => x.UserName == recipientUsername);
+
+            if (recipient == null) throw new UserNotFoundException();
+
             var conversationEntity = new Conversation
             {
-                RoomName = conversation.RoomName,
                 CreatedAt = DateTime.Now,
-                CreatedByAppUserId = userId
+                CreatedByAppUser = creator,
+                Recipient = recipient
             };
+            
             _repository.ConversationRepository.CreateConversation(conversationEntity);
             await _repository.SaveAsync();
-
-            // Create Conversation + Save
         }
 
         public async Task<ConversationDto> GetConversation(int id, bool trackChanges)
         {
             var conversation = await _repository.ConversationRepository.GetConversation(id, trackChanges);
-            
-            if (conversation == null) 
-                throw new Exception("Something went wrong when getting conversation");
+
+            if (conversation == null)
+                throw new ConversationNotFoundException(id);
 
             var messages = await _repository.ChatMessageRepository.GetMessages(id, trackChanges: false);
             
             var conversationDto = new ConversationDto
             {
                 Id = conversation.Id,
-                RoomName = conversation.RoomName,
                 CreatedAt = conversation.CreatedAt,
-                CreatedByAppUserName = conversation.CreatedByAppUser?.UserName!,
+                CreatedBy = conversation.CreatedByAppUser?.UserName!,
+                Recipient = conversation.Recipient?.UserName!,
                 ChatMessages = messages.Select(x => new MessageDto
                 {
                     Id = x.Id,

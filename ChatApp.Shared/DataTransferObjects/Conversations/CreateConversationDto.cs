@@ -2,7 +2,7 @@
 {
     public class CreateConversationDto
     {
-        public string RoomName { get; set; } = string.Empty;
-        public int CreatedByAppUserId { get; set; }
+        public string RecipientUsername { get; set; } = string.Empty;
+        public string? StartMessage { get; set; }
     }
 }

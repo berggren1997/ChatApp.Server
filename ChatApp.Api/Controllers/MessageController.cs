@@ -1,5 +1,6 @@
 ﻿using ChatApp.Service.Contracts;
 using ChatApp.Shared.DataTransferObjects.ChatMessages;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApp.Api.Controllers
@@ -15,7 +16,7 @@ namespace ChatApp.Api.Controllers
             _service = service;
         }
 
-        [HttpPost]
+        [HttpPost("{conversationId}"), Authorize(Policy = "ConversationMessageRequirements")]
         public async Task<IActionResult> CreateChatMessage(int conversationId, CreateChatMessageDto chatMessage)
         {
             try

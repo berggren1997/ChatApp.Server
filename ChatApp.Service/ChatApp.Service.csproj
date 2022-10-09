@@ -7,12 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="6.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.23.1" />
+	  <FrameworkReference Include="Microsoft.AspNetCore.App"/>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ChatApp.Contracts\ChatApp.Contracts.csproj" />
+    <ProjectReference Include="..\ChatApp.DataAccess\ChatApp.DataAccess.csproj" />
     <ProjectReference Include="..\ChatApp.Service.Contracts\ChatApp.Service.Contracts.csproj" />
   </ItemGroup>
 

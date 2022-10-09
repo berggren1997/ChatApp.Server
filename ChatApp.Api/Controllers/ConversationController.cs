@@ -1,5 +1,6 @@
 ﻿using ChatApp.Service.Contracts;
 using ChatApp.Shared.DataTransferObjects.Conversations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApp.Api.Controllers
@@ -16,11 +17,11 @@ namespace ChatApp.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateConversation(CreateConversationDto conversation)
+        public async Task<IActionResult> CreateConversation(string recipientUsername)
         {
             try
             {
-                await _service.ConversationService.CreateConversation(conversation);
+                await _service.ConversationService.CreateConversation(recipientUsername);
                 return StatusCode(201);
             }
             catch (Exception e)
@@ -29,10 +30,11 @@ namespace ChatApp.Api.Controllers
             }
         }
 
-        [HttpGet("{conversationId}")]
+        [HttpGet("{conversationId}"), Authorize(Policy = "ConversationMessageRequirements")]
         public async Task<IActionResult> GetConversation(int conversationId)
         {
-            var conversation = await _service.ConversationService.GetConversation(conversationId, trackChanges: false);
+            var conversation = await _service.ConversationService
+                .GetConversation(conversationId, trackChanges: false);
 
             return conversation != null ? Ok(conversation) : NotFound("No conversation found.");
         }
