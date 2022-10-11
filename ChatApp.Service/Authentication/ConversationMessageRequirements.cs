@@ -31,6 +31,9 @@ namespace ChatApp.Service.Authentication
             //TODO: not sure if i want to send a message with a route value?
             //should maybe be with a param, check this when working on client, cuz this works
             //on the backend
+            // Maybe split into another Authorization policy, one for getting conversation,
+            //one for sending message to conversation
+            //one for editing/deleting a message in a conversation (only user who sent message)
             int conversationId = int.Parse(_httpContextAccessor.HttpContext.Request
                 .RouteValues.SingleOrDefault(x => x.Key == "conversationId").Value?.ToString());
 

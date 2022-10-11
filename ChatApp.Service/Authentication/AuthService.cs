@@ -1,4 +1,5 @@
-﻿using ChatApp.Entities.Models;
+﻿using ChatApp.Entities.Exceptions.NotFoundRequests;
+using ChatApp.Entities.Models;
 using ChatApp.Service.Contracts.Authentication;
 using ChatApp.Shared.DataTransferObjects.User;
 using Microsoft.AspNetCore.Identity;
@@ -53,13 +54,13 @@ namespace ChatApp.Service.Authentication
 
         public async Task<List<UserDto>> SearchForUserByUsername(string username)
         {
-            var users = await _userManager.Users
+            var user = await _userManager.Users
                 .Where(x => x.UserName.Contains(username)).ToListAsync();
 
-            if(users == null) 
-                throw new Exception("No users with given search term was found.");
+            if (user == null)
+                throw new UserNotFoundException();
 
-            var usersDto = users.Select(x => new UserDto
+            var usersDto = user.Select(x => new UserDto
             {
                 Id = x.Id,
                 Username = x.UserName
