@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace ChatApp.Service.Authentication
@@ -20,7 +21,7 @@ namespace ChatApp.Service.Authentication
 
         private AppUser? _currentUser;
 
-        public AuthService(UserManager<AppUser> userManager, IConfiguration configuration, 
+        public AuthService(UserManager<AppUser> userManager, IConfiguration configuration,
             IUserAccessor userAccessor)
         {
             _userManager = userManager;
@@ -46,8 +47,8 @@ namespace ChatApp.Service.Authentication
         {
             _currentUser = await _userManager.FindByNameAsync(userDto.Username);
 
-            // TODO: Kasta custom exception
-            if (_currentUser == null) throw new Exception();
+            if (_currentUser == null)
+                throw new UserNotFoundException();
 
             return _currentUser != null && await _userManager.CheckPasswordAsync(_currentUser, userDto.Password);
         }
@@ -76,7 +77,7 @@ namespace ChatApp.Service.Authentication
             return user;
         }
 
-        public async Task<string> CreateToken()
+        public async Task<JwtTokenDto> CreateToken(bool populateRefreshToken)
         {
             var signingCredentials = GetSigningCredentials();
             var claims = await GetClaims();
@@ -84,12 +85,21 @@ namespace ChatApp.Service.Authentication
 
             var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
-            return accessToken;
+            var refreshToken = GenerateRefreshToken();
+
+            _currentUser!.RefreshToken = refreshToken;
+
+            if (populateRefreshToken)
+                _currentUser.RefreshTokenExpiryDate = DateTime.Now.AddDays(7);
+
+            await _userManager.UpdateAsync(_currentUser!);
+
+            return new JwtTokenDto { AccessToken = accessToken, RefreshToken = refreshToken };
         }
         private SigningCredentials GetSigningCredentials()
         {
             var key = Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]);
-            
+
             var secret = new SymmetricSecurityKey(key);
 
             return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
@@ -117,11 +127,64 @@ namespace ChatApp.Service.Authentication
                 issuer: _configuration["JwtSettings:Issuer"],
                 audience: _configuration["JwtSettings:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddDays(10),
+                expires: DateTime.Now.AddMinutes(15),
                 signingCredentials: signingCredentials
                 );
 
             return tokenOptions;
+        }
+
+        private string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return Convert.ToBase64String(randomNumber);
+            }
+        }
+
+        public async Task<JwtTokenDto> RefreshToken(string accessToken, string refreshToken)
+        {
+            var principals = GetClaimsPrincipalFromExpiredToken(accessToken);
+
+            var user = await _userManager.FindByNameAsync(principals.Identity!.Name);
+
+            if (user == null || user.RefreshToken != refreshToken ||
+                user.RefreshTokenExpiryDate <= DateTime.Now)
+            {
+                //TODO: Kasta ett custom fel här
+                throw new Exception($"Invalid token passed in {nameof(RefreshToken)} method.");
+            }
+
+            _currentUser = user;
+
+            return await CreateToken(populateRefreshToken: false);
+        }
+
+        private ClaimsPrincipal GetClaimsPrincipalFromExpiredToken(string accessToken)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]))
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            var principal = tokenHandler.ValidateToken(accessToken, tokenValidationParameters, out var securityToken);
+            var jwtSecurityToken = securityToken as JwtSecurityToken;
+
+            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
+                StringComparison.InvariantCultureIgnoreCase))
+            {
+                throw new SecurityTokenException("Invalid token.");
+            }
+            return principal;
         }
     }
 }

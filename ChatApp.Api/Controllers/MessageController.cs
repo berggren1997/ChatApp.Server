@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ChatApp.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     public class MessageController : ControllerBase
     {
         private readonly IServiceManager _service;

@@ -18,6 +18,13 @@ namespace ChatApp.DataAccess.Repositories
             .Include(x => x.CreatedByAppUser)
             .ToListAsync();
 
+        public async Task<IEnumerable<Conversation>> GetAllUserConversations(int userId, bool trackChanges) =>
+            await FindByCondition(x => x.CreatedByAppUser.Id == userId || x.Recipient.Id == userId, trackChanges)
+            .Include(x => x.CreatedByAppUser)
+            .Include(x => x.Recipient)
+            .Include(x => x.Messages)
+            .ToListAsync();
+
         public async Task<Conversation> GetConversation(int id, bool trackChanges) =>
             await FindByCondition(x => x.Id == id, trackChanges)
             .Include(x => x.CreatedByAppUser)

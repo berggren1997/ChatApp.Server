@@ -71,10 +71,10 @@ namespace ChatApp.Api.Extensions.Service
                 options.AddPolicy("DefaultPolicy", config =>
                 {
                     config.AllowAnyHeader();
-                    config.AllowAnyOrigin();
+                    //config.AllowAnyOrigin();
                     config.AllowAnyMethod();
-                    //config.WithOrigins("https://localhost:7244");
-                    //config.AllowCredentials();
+                    config.WithOrigins("http://localhost:3000");
+                    config.AllowCredentials();
                 });
             });
         }
@@ -129,7 +129,8 @@ namespace ChatApp.Api.Extensions.Service
                     //ValidIssuer = configuration["JwtSettings:Issuer"],
                     //ValidAudience = configuration["JwtSettings:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
-                    .GetBytes(configuration["JwtSettings:Key"]))
+                    .GetBytes(configuration["JwtSettings:Key"])),
+                    ClockSkew = TimeSpan.Zero
                 };
                 //options.Events = new JwtBearerEvents
                 //{

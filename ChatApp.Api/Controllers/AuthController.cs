@@ -1,11 +1,12 @@
 ﻿using ChatApp.Service.Contracts;
 using ChatApp.Shared.DataTransferObjects.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApp.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly IServiceManager _service;
@@ -32,8 +33,28 @@ namespace ChatApp.Api.Controllers
             var currentUser = await _service.AuthService.ValidateUser(user);
 
             if (!currentUser) return BadRequest("Bad credentials");
+
+            var token = await _service.AuthService.CreateToken(updateRefreshToken: true);
+
+            SetRefreshToken(token.RefreshToken);
+
+            return Ok(new { token = token.AccessToken });
+        }
+
+        [HttpPost("refresh"), Authorize]
+        public async Task<IActionResult> RefreshToken([FromBody] string accessToken)
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
             
-            return Ok(new { token = await _service.AuthService.CreateToken() });
+            if(refreshToken == null)
+            {
+                return Unauthorized("No valid token");
+            }
+            var tokens = await _service.AuthService.RefreshToken(accessToken, refreshToken);
+
+            SetRefreshToken(tokens.RefreshToken);
+
+            return Ok(new { accessToken = tokens.AccessToken });
         }
 
         [HttpGet("search/{username}")]
@@ -44,12 +65,21 @@ namespace ChatApp.Api.Controllers
             return users != null ? Ok(users) : NotFound("There were no users in database");
         }
 
+        private void SetRefreshToken(string refreshToken)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true
+            };
+            Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
+        }
+
         /// <summary>
         /// Test method to check authenticaion in swagger
         /// </summary>
         /// <returns></returns>
 
-        [HttpGet("current-user")]
+        [HttpGet("current-user"), Authorize]
         public string CurrentUser()
         {
             var user = User.Identity.Name;

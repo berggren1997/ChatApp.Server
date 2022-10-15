@@ -5,6 +5,7 @@ namespace ChatApp.Service.Contracts.Conversations
     public interface IConversationService
     {
         Task<ConversationDto> GetConversation(int id, bool trackChanges);
-        Task CreateConversation(/*CreateConversationDto conversation, */string recipientUsername);
+        Task<List<ConversationDto>> GetAllUserConversations(bool trackChanges);
+        Task CreateConversation(string recipientUsername);
     }
 }

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ChatApp.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     public class ConversationController : ControllerBase
     {
         private readonly IServiceManager _service;
@@ -28,6 +28,13 @@ namespace ChatApp.Api.Controllers
             {
                 return BadRequest($"Problem creating conversation, {e.Message}");
             }
+        }
+        [HttpGet("userConversations")]
+        public async Task<ActionResult<List<ConversationDto>>> GetAllUserConversations()
+        {
+            var conversations = await _service.ConversationService.GetAllUserConversations(trackChanges: true);
+
+            return conversations != null ? Ok(conversations) : NotFound("No conversations found!");
         }
 
         [HttpGet("{conversationId}"), Authorize(Policy = "ConversationMessageRequirements")]

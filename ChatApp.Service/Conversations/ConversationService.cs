@@ -47,6 +47,40 @@ namespace ChatApp.Service.Conversations
             await _repository.SaveAsync();
         }
 
+        public async Task<List<ConversationDto>> GetAllUserConversations(bool trackChanges)
+        {
+            var senderUsername = _userAccessor.GetCurrentUserName();
+            
+            if (senderUsername == null) 
+                throw new Exception();
+            
+            var user = await _userManager.FindByNameAsync(senderUsername);
+            
+            if (user == null) 
+                throw new UserNotFoundException();
+
+            var conversations = await _repository.ConversationRepository
+                .GetAllUserConversations(user.Id, trackChanges);
+
+            if (conversations == null)
+                throw new ConversationNotFoundException();
+
+            return conversations.Select(x => new ConversationDto
+            {
+                Id = x.Id,
+                CreatedAt = x.CreatedAt,
+                CreatedBy = x.CreatedByAppUser?.UserName!,
+                Recipient = x.Recipient?.UserName!,
+                ChatMessages = x.Messages.Select(x => new MessageDto
+                {
+                    Id = x.Id,
+                    CreatedAt = x.CreatedAt,
+                    FromUsername = x.Sender?.UserName!,
+                    Message = x.ChatMessage
+                }).ToList()
+            }).ToList();
+        }
+
         public async Task<ConversationDto> GetConversation(int id, bool trackChanges)
         {
             var conversation = await _repository.ConversationRepository.GetConversation(id, trackChanges);
