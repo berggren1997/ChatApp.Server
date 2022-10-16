@@ -25,12 +25,17 @@ namespace ChatApp.Service.Conversations
         }
 
         public async Task CreateConversation(string recipientUsername)
-        {
+        {   
+            var creatorUsername = _userAccessor.GetCurrentUserName();
+            
+            //if (creatorId == 0) throw new UserNotFoundException();
+            
             var creator = await _userManager.Users
-                .FirstOrDefaultAsync(x => x.Id == _userAccessor.GetCurrentUserId());
+                .FirstOrDefaultAsync(x => x.UserName == creatorUsername);
 
-            if (creator == null) throw new UserNotFoundException();
-
+            if (creator == null) 
+                throw new UserNotFoundException("Creator of conversation was not found in database.");
+            
             var recipient = await _userManager.Users
                 .FirstOrDefaultAsync(x => x.UserName == recipientUsername);
 

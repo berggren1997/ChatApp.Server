@@ -38,11 +38,11 @@ namespace ChatApp.Api.Controllers
 
             SetRefreshToken(token.RefreshToken);
 
-            return Ok(new { token = token.AccessToken });
+            return Ok(new { accessToken = token.AccessToken });
         }
 
-        [HttpPost("refresh"), Authorize]
-        public async Task<IActionResult> RefreshToken([FromBody] string accessToken)
+        [HttpGet("refresh")/*, Authorize*/]
+        public async Task<IActionResult> RefreshToken()
         {
             var refreshToken = Request.Cookies["refreshToken"];
             
@@ -50,10 +50,11 @@ namespace ChatApp.Api.Controllers
             {
                 return Unauthorized("No valid token");
             }
-            var tokens = await _service.AuthService.RefreshToken(accessToken, refreshToken);
+
+            var tokens = await _service.AuthService.RefreshToken(refreshToken);
 
             SetRefreshToken(tokens.RefreshToken);
-
+            
             return Ok(new { accessToken = tokens.AccessToken });
         }
 
@@ -62,14 +63,16 @@ namespace ChatApp.Api.Controllers
         {
             var users = await _service.AuthService.SearchForUserByUsername(username);
 
-            return users != null ? Ok(users) : NotFound("There were no users in database");
+            return users.Any() ? Ok(users) : NotFound("There were no users in database");
         }
 
         private void SetRefreshToken(string refreshToken)
         {
             var cookieOptions = new CookieOptions
             {
-                HttpOnly = true
+                HttpOnly = true,
+                SameSite = SameSiteMode.None,
+                Secure = true
             };
             Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
         }
@@ -80,10 +83,10 @@ namespace ChatApp.Api.Controllers
         /// <returns></returns>
 
         [HttpGet("current-user"), Authorize]
-        public string CurrentUser()
+        public async Task<string> CurrentUser()
         {
             var user = User.Identity.Name;
-            return user != null ? $"Hello {user}" : "No user found";
+            return user != null ? await Task.FromResult("Hello " + user) : "No user found";
         }
     }
 }

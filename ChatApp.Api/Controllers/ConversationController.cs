@@ -16,20 +16,16 @@ namespace ChatApp.Api.Controllers
             _service = service;
         }
 
-        [HttpPost]
+        [HttpPost("{recipientUsername}")]
         public async Task<IActionResult> CreateConversation(string recipientUsername)
         {
-            try
-            {
-                await _service.ConversationService.CreateConversation(recipientUsername);
-                return StatusCode(201);
-            }
-            catch (Exception e)
-            {
-                return BadRequest($"Problem creating conversation, {e.Message}");
-            }
+
+            await _service.ConversationService.CreateConversation(recipientUsername);
+            return StatusCode(201);
+
+
         }
-        [HttpGet("userConversations")]
+        [HttpGet("userConversations"), Authorize]
         public async Task<ActionResult<List<ConversationDto>>> GetAllUserConversations()
         {
             var conversations = await _service.ConversationService.GetAllUserConversations(trackChanges: true);

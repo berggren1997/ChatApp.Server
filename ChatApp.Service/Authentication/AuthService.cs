@@ -127,7 +127,7 @@ namespace ChatApp.Service.Authentication
                 issuer: _configuration["JwtSettings:Issuer"],
                 audience: _configuration["JwtSettings:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(15),
+                expires: DateTime.Now.AddMinutes (15),
                 signingCredentials: signingCredentials
                 );
 
@@ -144,20 +144,22 @@ namespace ChatApp.Service.Authentication
             }
         }
 
-        public async Task<JwtTokenDto> RefreshToken(string accessToken, string refreshToken)
+        public async Task<JwtTokenDto> RefreshToken(/*string accessToken, */string refreshToken)
         {
-            var principals = GetClaimsPrincipalFromExpiredToken(accessToken);
+            //var principals = GetClaimsPrincipalFromExpiredToken(accessToken);
+            _currentUser = await _userManager.Users.Where(x => x.RefreshToken == refreshToken)
+                .FirstOrDefaultAsync();
 
-            var user = await _userManager.FindByNameAsync(principals.Identity!.Name);
+            //var user = await _userManager.FindByNameAsync(principals.Identity!.Name);
 
-            if (user == null || user.RefreshToken != refreshToken ||
-                user.RefreshTokenExpiryDate <= DateTime.Now)
+            if (_currentUser == null || _currentUser.RefreshToken != refreshToken ||
+                _currentUser.RefreshTokenExpiryDate <= DateTime.Now)
             {
                 //TODO: Kasta ett custom fel här
                 throw new Exception($"Invalid token passed in {nameof(RefreshToken)} method.");
             }
 
-            _currentUser = user;
+            //_currentUser = user;
 
             return await CreateToken(populateRefreshToken: false);
         }

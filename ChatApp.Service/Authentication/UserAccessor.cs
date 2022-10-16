@@ -15,7 +15,7 @@ namespace ChatApp.Service.Authentication
 
         public string? GetCurrentUserName()
         {
-            var username = _context.HttpContext.User?.Claims?
+            var username = _context?.HttpContext?.User?.Claims?
                 .FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
 
             return username;
@@ -27,8 +27,9 @@ namespace ChatApp.Service.Authentication
         /// <returns>userid or -1</returns>
         public int GetCurrentUserId()
         {
-            var userIdString = _context.HttpContext.User?.Claims.First(x => x.Type == "userId").Value;
+            string? userIdString = _context?.HttpContext?.User?.Claims?.FirstOrDefault(x => x.Type == "userId").Value ?? null;
 
+            if (userIdString == null) return 0;
             return int.TryParse(userIdString, out var id) ? id : 0;
         }
     }
