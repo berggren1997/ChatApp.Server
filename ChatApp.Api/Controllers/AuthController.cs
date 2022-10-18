@@ -34,11 +34,11 @@ namespace ChatApp.Api.Controllers
 
             if (!currentUser) return BadRequest("Bad credentials");
 
-            var token = await _service.AuthService.CreateToken(updateRefreshToken: true);
+            var authResponse = await _service.AuthService.CreateToken(updateRefreshToken: true);
 
-            SetRefreshToken(token.RefreshToken);
+            SetRefreshToken(authResponse.RefreshToken);
 
-            return Ok(new { accessToken = token.AccessToken });
+            return Ok(new { accessToken = authResponse.AccessToken, username = authResponse.Username });
         }
 
         [HttpGet("refresh")]
@@ -51,11 +51,11 @@ namespace ChatApp.Api.Controllers
                 return Unauthorized("No valid token");
             }
 
-            var tokens = await _service.AuthService.RefreshToken(refreshToken);
+            var authResponse = await _service.AuthService.RefreshToken(refreshToken);
 
-            SetRefreshToken(tokens.RefreshToken);
+            SetRefreshToken(authResponse.RefreshToken);
             
-            return Ok(new { accessToken = tokens.AccessToken });
+            return Ok(new { accessToken = authResponse.AccessToken, username = authResponse.Username });
         }
 
         [HttpGet("search/{username}")]

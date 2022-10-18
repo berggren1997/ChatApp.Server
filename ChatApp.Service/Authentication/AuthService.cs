@@ -94,7 +94,8 @@ namespace ChatApp.Service.Authentication
 
             await _userManager.UpdateAsync(_currentUser!);
 
-            return new JwtTokenDto { AccessToken = accessToken, RefreshToken = refreshToken };
+            return new JwtTokenDto { AccessToken = accessToken, RefreshToken = refreshToken,
+            Username = _currentUser.UserName };
         }
         private SigningCredentials GetSigningCredentials()
         {

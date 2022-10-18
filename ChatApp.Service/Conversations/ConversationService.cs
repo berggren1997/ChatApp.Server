@@ -25,7 +25,7 @@ namespace ChatApp.Service.Conversations
             _userManager = userManager;
         }
 
-        public async Task CreateConversation(string recipientUsername)
+        public async Task<int> CreateConversation(string recipientUsername)
         {   
             var creatorUsername = _userAccessor.GetCurrentUserName();
 
@@ -59,6 +59,8 @@ namespace ChatApp.Service.Conversations
             
             _repository.ConversationRepository.CreateConversation(conversationEntity);
             await _repository.SaveAsync();
+
+            return conversationEntity.Id;
         }
 
         public async Task<List<ConversationDto>> GetAllUserConversations(bool trackChanges)

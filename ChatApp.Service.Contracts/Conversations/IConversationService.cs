@@ -6,6 +6,6 @@ namespace ChatApp.Service.Contracts.Conversations
     {
         Task<ConversationDto> GetConversation(int id, bool trackChanges);
         Task<List<ConversationDto>> GetAllUserConversations(bool trackChanges);
-        Task CreateConversation(string recipientUsername);
+        Task<int> CreateConversation(string recipientUsername);
     }
 }

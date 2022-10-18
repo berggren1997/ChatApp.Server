@@ -19,10 +19,9 @@ namespace ChatApp.Api.Controllers
         [HttpPost("{recipientUsername}")]
         public async Task<IActionResult> CreateConversation(string recipientUsername)
         {
-
-            await _service.ConversationService.CreateConversation(recipientUsername);
-            return StatusCode(201);
-
+            //TODO: Lägg till så att jag kan använda createdatroute, så status code blir 201 ist för 200
+            var conversationId = await _service.ConversationService.CreateConversation(recipientUsername);
+            return Ok(conversationId);
         }
         [HttpGet("userConversations"), Authorize]
         public async Task<ActionResult<List<ConversationDto>>> GetAllUserConversations()
