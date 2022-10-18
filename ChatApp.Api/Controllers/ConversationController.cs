@@ -23,7 +23,6 @@ namespace ChatApp.Api.Controllers
             await _service.ConversationService.CreateConversation(recipientUsername);
             return StatusCode(201);
 
-
         }
         [HttpGet("userConversations"), Authorize]
         public async Task<ActionResult<List<ConversationDto>>> GetAllUserConversations()

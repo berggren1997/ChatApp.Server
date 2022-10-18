@@ -41,7 +41,7 @@ namespace ChatApp.Api.Controllers
             return Ok(new { accessToken = token.AccessToken });
         }
 
-        [HttpGet("refresh")/*, Authorize*/]
+        [HttpGet("refresh")]
         public async Task<IActionResult> RefreshToken()
         {
             var refreshToken = Request.Cookies["refreshToken"];

@@ -1,4 +1,5 @@
 ﻿using ChatApp.Contracts.Repositories;
+using ChatApp.Entities.Exceptions.BadRequests;
 using ChatApp.Entities.Exceptions.NotFoundRequests;
 using ChatApp.Entities.Models;
 using ChatApp.Service.Contracts.Authentication;
@@ -27,19 +28,27 @@ namespace ChatApp.Service.Conversations
         public async Task CreateConversation(string recipientUsername)
         {   
             var creatorUsername = _userAccessor.GetCurrentUserName();
-            
-            //if (creatorId == 0) throw new UserNotFoundException();
-            
+
             var creator = await _userManager.Users
                 .FirstOrDefaultAsync(x => x.UserName == creatorUsername);
 
             if (creator == null) 
                 throw new UserNotFoundException("Creator of conversation was not found in database.");
-            
+
+            if (creator.UserName == recipientUsername)
+                throw new UserBadRequestException("Can't start a conversation with yourself.");
+
             var recipient = await _userManager.Users
                 .FirstOrDefaultAsync(x => x.UserName == recipientUsername);
 
-            if (recipient == null) throw new UserNotFoundException();
+            if (recipient == null) 
+                throw new UserNotFoundException();
+
+            var conversationCheck = await _repository.ConversationRepository
+                .GetConversation(creator.UserName, recipient.UserName, trackChanges: true);
+            
+            if (conversationCheck != null) 
+                throw new ConversationBadRequestException("Conversation between the parties already exists.");
 
             var conversationEntity = new Conversation
             {

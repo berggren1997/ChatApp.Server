@@ -31,5 +31,12 @@ namespace ChatApp.DataAccess.Repositories
             .Include(x => x.Recipient)
             .Include(x => x.Messages)
             .FirstOrDefaultAsync();
+
+        public async Task<Conversation> GetConversation(string creator, string recipient, bool trackChanges) =>
+            await FindByCondition(x => x.CreatedByAppUser.UserName == creator &&
+            x.Recipient.UserName == recipient, trackChanges)
+            .Include(x => x.CreatedByAppUser)
+            .Include(x => x.Recipient)
+            .FirstOrDefaultAsync();
     }
 }
