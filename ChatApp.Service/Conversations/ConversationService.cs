@@ -104,6 +104,14 @@ namespace ChatApp.Service.Conversations
             if (conversation == null)
                 throw new ConversationNotFoundException(id);
 
+            var currentUsername = _userAccessor.GetCurrentUserName();
+
+            if(currentUsername != conversation.CreatedByAppUser.UserName &&
+                currentUsername != conversation.Recipient.UserName)
+            {
+                throw new UserBadRequestException("User is not a part of that conversation");
+            }
+
             var messages = await _repository.ChatMessageRepository.GetMessages(id, trackChanges: false);
             
             var conversationDto = new ConversationDto

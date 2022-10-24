@@ -16,7 +16,7 @@ namespace ChatApp.Api.Controllers
             _service = service;
         }
 
-        [HttpPost("{recipientUsername}")]
+        [HttpPost("{recipientUsername}"), Authorize]
         public async Task<IActionResult> CreateConversation(string recipientUsername)
         {
             //TODO: Lägg till så att jag kan använda createdatroute, så status code blir 201 ist för 200
@@ -31,7 +31,7 @@ namespace ChatApp.Api.Controllers
             return conversations != null ? Ok(conversations) : NotFound("No conversations found!");
         }
 
-        [HttpGet("{conversationId}"), Authorize(Policy = "ConversationMessageRequirements")]
+        [HttpGet("{conversationId}"), Authorize/*(Policy = "ConversationMessageRequirements")*/]
         public async Task<IActionResult> GetConversation(int conversationId)
         {
             var conversation = await _service.ConversationService

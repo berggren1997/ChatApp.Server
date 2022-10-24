@@ -73,7 +73,7 @@ namespace ChatApp.Api.Extensions.Service
                     config.AllowAnyHeader();
                     //config.AllowAnyOrigin();
                     config.AllowAnyMethod();
-                    config.WithOrigins("http://localhost:3000");
+                    config.WithOrigins("http://localhost:3000", "https://localhost:7204");
                     config.AllowCredentials();
                 });
             });

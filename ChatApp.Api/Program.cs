@@ -1,5 +1,6 @@
 using ChatApp.Api.Extensions.Middleware;
 using ChatApp.Api.Extensions.Service;
+using ChatApp.Api.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,7 @@ builder.Services.ConfigureServiceManager();
 builder.Services.ConfigureUserAccessorService();
 builder.Services.ConfiugreSwaggerAuthentication();
 builder.Services.ConfigureConversationAuthorizationHandler();
-//builder.Services.AddSignalR();
+builder.Services.AddSignalR();
 
 builder.Services.ConfigureCustomAuthPolicy();
 
@@ -40,6 +41,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 //app.UseRouting();
+
+app.MapHub<ChatHub>("/chathub");
 
 app.MapControllers();
 

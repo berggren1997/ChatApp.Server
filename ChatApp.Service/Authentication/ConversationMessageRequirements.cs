@@ -24,7 +24,7 @@ namespace ChatApp.Service.Authentication
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, 
             ConversationMessageRequirements requirement)
         {
-            var username = context.User.FindFirstValue(ClaimTypes.Name);
+            var username = context.User.Identity.Name;
 
             if (username == null) return Task.CompletedTask;
             
