@@ -1,1 +1,1 @@
-# ChatApp.Server
+# Chat platform - API
