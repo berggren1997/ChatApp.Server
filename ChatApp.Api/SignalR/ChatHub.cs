@@ -1,20 +1,50 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using ChatApp.Contracts.Repositories;
+using ChatApp.Entities.Models;
+using ChatApp.Service.Contracts;
+using ChatApp.Service.Contracts.Authentication;
+using ChatApp.Shared.DataTransferObjects.ChatMessages;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
+using System.Security.Claims;
 
 namespace ChatApp.Api.SignalR
 {
+    [Authorize]
     public class ChatHub : Hub
     {
-        public override async Task OnConnectedAsync()
+        private readonly IServiceManager _serviceManager;
+
+        public ChatHub(IServiceManager serviceManager)
         {
-            await SendMessageAsync($"Connection Id: {Context.ConnectionId} has connected");
+            _serviceManager = serviceManager;
         }
 
-        public async Task SendMessageAsync(string message)
+        public override async Task OnConnectedAsync()
         {
-            if (message.ToLower() == "ping")
+            await Clients.All.SendAsync("OnConnected", "User connected");
+        }
+        public override Task OnDisconnectedAsync(Exception? exception)
+        {
+            return base.OnDisconnectedAsync(exception);
+        }
+
+        public async Task SendMessageAsync(string message, int conversationId)
+        {
+            var user = Context.User.FindFirst(ClaimTypes.Name).Value;
+            
+            if (user == null) return;
+
+            var newMessageDto = new CreateChatMessageDto
             {
-                await Clients.All.SendAsync("ReceiveMessage", "PONG!");
-            }
+                Message = message,
+                CreatedAt = DateTime.Now
+            };
+
+            var messageToReturn = await _serviceManager.ChatMessageService
+                .CreateChatMessage(conversationId, newMessageDto,
+                trackChanges: true);
+            await Clients.All.SendAsync("ReceiveMessage", messageToReturn);
+            
         }
 
     }

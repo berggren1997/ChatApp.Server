@@ -16,12 +16,22 @@ namespace ChatApp.Api.Controllers
             _service = service;
         }
 
+        [HttpGet("{conversationId}"), Authorize]
+        public async Task<IActionResult> GetMessagesInConversation(int conversationId)
+        {
+            var messages = await _service.ChatMessageService
+                .GetChatMessagesInConversation(conversationId, trackChanges: false);
+
+            return messages != null ? Ok(messages) : NotFound("No messages found");
+        }
+
         [HttpPost("{conversationId}"), Authorize(Policy = "ConversationMessageRequirements")]
         public async Task<IActionResult> CreateChatMessage(int conversationId, CreateChatMessageDto chatMessage)
         {
             try
             {
-                await _service.ChatMessageService.CreateChatMessage(conversationId, chatMessage, trackChanges: true);
+                await _service.ChatMessageService.CreateChatMessage(conversationId, chatMessage, 
+                    trackChanges: true);
                 return StatusCode(201);
             }
             catch (Exception e)

@@ -106,8 +106,8 @@ namespace ChatApp.Service.Conversations
 
             var currentUsername = _userAccessor.GetCurrentUserName();
 
-            if(currentUsername != conversation.CreatedByAppUser.UserName &&
-                currentUsername != conversation.Recipient.UserName)
+            if(currentUsername != conversation.CreatedByAppUser!.UserName &&
+                currentUsername != conversation.Recipient!.UserName)
             {
                 throw new UserBadRequestException("User is not a part of that conversation");
             }

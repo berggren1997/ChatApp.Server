@@ -4,6 +4,7 @@ namespace ChatApp.Service.Contracts.Message
 {
     public interface IChatMessageService
     {
-        Task CreateChatMessage(int conversationId, CreateChatMessageDto chatMessage, bool trackChanges);
+        Task<MessageDto> CreateChatMessage(int conversationId, CreateChatMessageDto chatMessage, bool trackChanges);
+        Task<IEnumerable<MessageDto>> GetChatMessagesInConversation(int conversationId, bool trackChanges);
     }
 }

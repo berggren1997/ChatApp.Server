@@ -1,4 +1,5 @@
 ﻿using ChatApp.Contracts.Repositories;
+using ChatApp.Entities.Exceptions.NotFoundRequests;
 using ChatApp.Entities.Models;
 using ChatApp.Service.Contracts.Authentication;
 using ChatApp.Service.Contracts.Message;
@@ -22,7 +23,7 @@ namespace ChatApp.Service.Messages
             _userAccessor = userAccessor;
         }
 
-        public async Task CreateChatMessage(int conversationId, CreateChatMessageDto chatMessage, 
+        public async Task<MessageDto> CreateChatMessage(int conversationId, CreateChatMessageDto chatMessage, 
             bool trackChanges)
         {
             // Get current conversation
@@ -30,17 +31,17 @@ namespace ChatApp.Service.Messages
                 .GetConversation(conversationId, trackChanges);
 
             if (conversation == null) 
-                throw new Exception($"No conversation with id {conversationId} was found");
+                throw new ConversationNotFoundException();
 
             //Get user sending request, to get the id.
-            var userId = _userAccessor.GetCurrentUserId();
+            var username = _userAccessor.GetCurrentUserName();
             
-            if(userId == -1) 
+            if(username == null) 
             {
-                throw new Exception("fml this method is so long");
+                throw new UserNotFoundException("User not authorized");
             }
 
-            var userSender = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            var userSender = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == username);
 
             // Map new message to entity model
             var chatMessageEntity = new Message
@@ -55,6 +56,32 @@ namespace ChatApp.Service.Messages
             conversation.Messages.Add(chatMessageEntity);
 
             await _repository.SaveAsync();
+
+            var messageToReturn = new MessageDto
+            {
+                Id = chatMessageEntity.Id,
+                CreatedAt = chatMessageEntity.CreatedAt,
+                Message = chatMessage.Message,
+                FromUsername = chatMessageEntity.Sender.UserName
+            };
+            return messageToReturn;
+        }
+
+        public async Task<IEnumerable<MessageDto>> GetChatMessagesInConversation(int conversationId, bool trackChanges)
+        {
+            var messages = await _repository.ChatMessageRepository.GetMessages(conversationId, trackChanges);
+            
+            if (messages == null) throw new Exception("No messages");
+
+            var messagesToReturn = messages.Select(x => new MessageDto
+            {
+                Id = x.Id,
+                Message = x.ChatMessage,
+                CreatedAt = x.CreatedAt,
+                FromUsername = x.Sender!.UserName
+            }).ToList();
+
+            return messagesToReturn;
         }
     }
 }

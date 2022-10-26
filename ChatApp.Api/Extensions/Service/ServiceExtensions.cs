@@ -132,21 +132,21 @@ namespace ChatApp.Api.Extensions.Service
                     .GetBytes(configuration["JwtSettings:Key"])),
                     ClockSkew = TimeSpan.Zero
                 };
-                //options.Events = new JwtBearerEvents
-                //{
-                //    OnMessageReceived = context =>
-                //    {
-                //        //this (access_token) has to be the EXACT name coming from client
-                //        var accessToken = context.Request.Query["token"];
-                //        var path = context.HttpContext.Request.Path;
-                //        if (!string.IsNullOrEmpty(accessToken) /*&& path.Value.Contains("chat")*/)
-                //        {
-                //            //inside our hubcontext, we will now have access to the users access token
-                //            context.Token = accessToken;
-                //        }
-                //        return Task.CompletedTask;
-                //    }
-                //};
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        //this (access_token) has to be the EXACT name coming from client
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) /*&& path.Value.Contains("chat")*/)
+                        {
+                            //inside our hubcontext, we will now have access to the users access token
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             });
         }
     }

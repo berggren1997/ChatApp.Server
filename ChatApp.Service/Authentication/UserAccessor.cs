@@ -17,7 +17,7 @@ namespace ChatApp.Service.Authentication
         {
             var username = _context?.HttpContext?.User?.Claims?
                 .FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
-
+            //var username = _context.HttpContext.User.FindFirst(ClaimTypes.Name).Value;
             return username;
         }
 

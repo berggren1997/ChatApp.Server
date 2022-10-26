@@ -23,6 +23,7 @@ namespace ChatApp.Api.Controllers
             var conversationId = await _service.ConversationService.CreateConversation(recipientUsername);
             return Ok(conversationId);
         }
+
         [HttpGet("userConversations"), Authorize]
         public async Task<ActionResult<List<ConversationDto>>> GetAllUserConversations()
         {
