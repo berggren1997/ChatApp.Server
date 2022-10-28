@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChatApp.DataAccess.Repositories
 {
-    public class ChatMessageRepository : RepositoryBase<Message>, IChatMessageRepository
+    public class MessageRepository : RepositoryBase<Message>, IMessageRepository
     {
 
-        public ChatMessageRepository(AppDbContext context) : base(context)
+        public MessageRepository(AppDbContext context) : base(context)
         { }
 
         public async Task<IEnumerable<Message>> GetMessages(int conversationId, bool trackChanges) =>

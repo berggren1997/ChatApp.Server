@@ -15,7 +15,7 @@ namespace ChatApp.Service
     public class ServiceManager : IServiceManager
     {
         private readonly Lazy<IConversationService> _conversationService;
-        private readonly Lazy<IChatMessageService> _chatMessageService;
+        private readonly Lazy<IMessageService> _chatMessageService;
         private readonly Lazy<IAuthService> _authService;
 
         public ServiceManager(UserManager<AppUser> userManager, IConfiguration configuration,
@@ -24,15 +24,15 @@ namespace ChatApp.Service
             _conversationService = new Lazy<IConversationService>(() =>
             new ConversationService(repository, userAccessor, userManager));
             
-            _chatMessageService = new Lazy<IChatMessageService>(() =>
-            new ChatMessageService(repository, userManager, userAccessor));
+            _chatMessageService = new Lazy<IMessageService>(() =>
+            new MessageService(repository, userManager, userAccessor));
             
             _authService = new Lazy<IAuthService>(() =>
             new AuthService(userManager, configuration, userAccessor));   
         }
 
         public IConversationService ConversationService => _conversationService.Value;
-        public IChatMessageService ChatMessageService => _chatMessageService.Value;
+        public IMessageService ChatMessageService => _chatMessageService.Value;
         public IAuthService AuthService => _authService.Value;
     }
 }

@@ -9,13 +9,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChatApp.Service.Messages
 {
-    public class ChatMessageService : IChatMessageService
+    public class MessageService : IMessageService
     {
         private readonly IRepositoryManager _repository;
         private readonly UserManager<AppUser> _userManager;
         private readonly IUserAccessor _userAccessor;
 
-        public ChatMessageService(IRepositoryManager repository, UserManager<AppUser> userManager, 
+        public MessageService(IRepositoryManager repository, UserManager<AppUser> userManager, 
             IUserAccessor userAccessor)
         {
             _repository = repository;
@@ -26,24 +26,26 @@ namespace ChatApp.Service.Messages
         public async Task<MessageDto> CreateChatMessage(int conversationId, CreateChatMessageDto chatMessage, 
             bool trackChanges)
         {
-            // Get current conversation
             var conversation = await _repository.ConversationRepository
                 .GetConversation(conversationId, trackChanges);
 
             if (conversation == null) 
                 throw new ConversationNotFoundException();
 
-            //Get user sending request, to get the id.
             var username = _userAccessor.GetCurrentUserName();
             
-            if(username == null) 
-            {
+            if(username == null)
                 throw new UserNotFoundException("User not authorized");
-            }
 
+            //TODO: TESTA IF-CHECKEN, EJ TESTAD
+            if (username != conversation.CreatedByAppUser?.UserName && 
+                username != conversation.Recipient?.UserName)
+            {
+                throw new UserNotFoundException("User not part of conversation");
+            }
+            //TODO: maybe this call is unnecessary. I think I already have the user via conversation object
             var userSender = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == username);
 
-            // Map new message to entity model
             var chatMessageEntity = new Message
             {
                 ChatMessage = chatMessage.Message,
@@ -67,11 +69,13 @@ namespace ChatApp.Service.Messages
             return messageToReturn;
         }
 
-        public async Task<IEnumerable<MessageDto>> GetChatMessagesInConversation(int conversationId, bool trackChanges)
+        public async Task<IEnumerable<MessageDto>> GetChatMessagesInConversation(int conversationId, 
+            bool trackChanges)
         {
             var messages = await _repository.ChatMessageRepository.GetMessages(conversationId, trackChanges);
-            
-            if (messages == null) throw new Exception("No messages");
+            //TODO: Not sure if i want to throw an exception here? Maybe returning an empty list is fine?
+            if (messages == null) 
+                throw new MessagesNotFoundException("No messages found in conversation.");
 
             var messagesToReturn = messages.Select(x => new MessageDto
             {

@@ -6,7 +6,7 @@ namespace ChatApp.Service.Contracts
 {
     public interface IServiceManager
     {
-        public IChatMessageService ChatMessageService { get; }
+        public IMessageService ChatMessageService { get; }
         public IConversationService ConversationService { get; }
         public IAuthService AuthService { get; }
     }

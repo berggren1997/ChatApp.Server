@@ -2,7 +2,7 @@
 
 namespace ChatApp.Contracts.Repositories
 {
-    public interface IChatMessageRepository
+    public interface IMessageRepository
     {
         Task<IEnumerable<Message>> GetMessages(int conversationId, bool trackChanges);
         void CreateMessage(Message message);

@@ -3,8 +3,10 @@
     public interface IRepositoryManager
     {
         public IConversationRepository ConversationRepository { get; }
-        public IChatMessageRepository ChatMessageRepository { get; }
+        public IMessageRepository ChatMessageRepository { get; }
+        public IGroupRepository GroupRepository { get; }
+        public IGroupMessageRepository GroupMessageRepository { get; }
 
-        Task SaveAsync();
+        public Task SaveAsync();
     }
 }
