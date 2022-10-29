@@ -14,12 +14,22 @@ namespace ChatApp.DataAccess.Repositories
 
         public async Task<Group> GetGroup(int groupId, bool trackChanges) =>
             await FindByCondition(x => x.Id == groupId, trackChanges)
+            .Include(x => x.CreatedBy)
             .Include(x => x.Participants)
             .Include(x => x.GroupMessages)
             .FirstOrDefaultAsync();
 
+        /// <summary>
+        /// AsSplitQuery to increase performance according to EF log warn
+        /// </summary>
+        /// <param name="trackChanges"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<Group>> GetGroups(bool trackChanges) =>
             await FindAll(trackChanges)
+            .AsSplitQuery()
+            .Include(x => x.CreatedBy)
+            .Include(x => x.Participants)
+            .Include(x => x.GroupMessages)
             .ToListAsync();
     }
 }

@@ -1,7 +1,4 @@
-﻿using ChatApp.Contracts.Repositories;
-using ChatApp.Entities.Models;
-using ChatApp.Service.Contracts;
-using ChatApp.Service.Contracts.Authentication;
+﻿using ChatApp.Service.Contracts;
 using ChatApp.Shared.DataTransferObjects.ChatMessages;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -40,7 +37,7 @@ namespace ChatApp.Api.SignalR
                 CreatedAt = DateTime.Now
             };
 
-            var messageToReturn = await _serviceManager.ChatMessageService
+            var messageToReturn = await _serviceManager.MessageService
                 .CreateChatMessage(conversationId, newMessageDto,
                 trackChanges: true);
             await Clients.All.SendAsync("ReceiveMessage", messageToReturn);

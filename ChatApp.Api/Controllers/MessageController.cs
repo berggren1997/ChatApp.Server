@@ -19,7 +19,7 @@ namespace ChatApp.Api.Controllers
         [HttpGet("{conversationId}"), Authorize]
         public async Task<IActionResult> GetMessagesInConversation(int conversationId)
         {
-            var messages = await _service.ChatMessageService
+            var messages = await _service.MessageService
                 .GetChatMessagesInConversation(conversationId, trackChanges: false);
 
             return messages != null ? Ok(messages) : NotFound("No messages found");
@@ -30,7 +30,7 @@ namespace ChatApp.Api.Controllers
         {
             try
             {
-                await _service.ChatMessageService.CreateChatMessage(conversationId, chatMessage, 
+                await _service.MessageService.CreateChatMessage(conversationId, chatMessage, 
                     trackChanges: true);
                 return StatusCode(201);
             }

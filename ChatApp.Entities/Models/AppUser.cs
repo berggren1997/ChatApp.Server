@@ -11,8 +11,5 @@ namespace ChatApp.Entities.Models
         public DateTime RefreshTokenExpiryDate { get; set; }
         public ICollection<Conversation> Conversations { get; set; } = new List<Conversation>();
 
-        // Relationships
-        //public ICollection<Message> ChatMessagesFromUser { get; set; } = new List<Message>();
-        //public ICollection<Message> ChatMessagesToUser { get; set; } = new List<Message>();
     }
 }
